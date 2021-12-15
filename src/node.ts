@@ -1,12 +1,10 @@
 // Node class
 export class Node {
   public data: unknown;
-  public left: Node;
-  public right: Node;
+  public left: Node | null = null;
+  public right: Node | null = null;
 
-  constructor(data: unknown, left?: Node, right?: Node) {
+  constructor(data: unknown) {
     this.data = data;
-    this.left = left;
-    this.right = right;
   }
 }
