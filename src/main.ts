@@ -59,11 +59,18 @@ const errorMessages = [
   "Stop wasting time!",
   "There and back again?",
 ];
-const successMessages = ["", "Nom nom nom!", "Oh no, I shouldn't!", ""];
+const successMessages = [
+  "",
+  "Nom nom nom!",
+  "Oh no, I shouldn't!",
+  "Lekker!",
+  "Heerlijk!",
+  "Afblijven.",
+];
 
 function getFailureMessage() {
   const index =
-    runState.failures < failureMessages.length
+    runState.failures <= failureMessages.length
       ? runState.failures - 1
       : Math.floor(Math.random() * failureMessages.length);
   return failureMessages[index];
@@ -71,7 +78,7 @@ function getFailureMessage() {
 
 function getErrorMessage() {
   const index =
-    runState.errors < errorMessages.length
+    runState.errors <= errorMessages.length
       ? runState.errors - 1
       : Math.floor(Math.random() * errorMessages.length);
   return errorMessages[index];
@@ -79,7 +86,7 @@ function getErrorMessage() {
 
 function getSuccessMessage() {
   const index =
-    runState.runs < successMessages.length
+    runState.runs <= successMessages.length
       ? runState.runs - 1
       : Math.floor(Math.random() * successMessages.length);
   return successMessages[index];
