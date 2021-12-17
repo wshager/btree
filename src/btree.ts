@@ -25,6 +25,7 @@ export class BTree {
       node[position] = newNode;
     } else {
       this.insertNode(node[position], newNode);
+      newNode.parent = node[position];
     }
   }
 }
