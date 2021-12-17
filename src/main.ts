@@ -176,6 +176,7 @@ function getSuccessMessage() {
     });
   } finally {
     updateData(depth);
+    document.getElementById("input")?.focus();
   }
 };
 
