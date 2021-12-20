@@ -39,10 +39,6 @@ body {
     -1px 1px 0 snow, 1px 1px 0 snow;
 }
 
-.node-visible {
-  visibility: visible;
-}
-
 .cookie:before {
   content: "";
   position: absolute;
@@ -67,6 +63,21 @@ body {
   background-size: 40px 40px;
   margin-top: -26px;
   margin-left: -10px;
+}
+
+.place {
+  -webkit-text-stroke: 3px gold;
+  animation: blink-animation 1.5s linear infinite;
+}
+
+@keyframes blink-animation {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .story {

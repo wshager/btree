@@ -2,6 +2,7 @@ import { breadthFirst, create } from ".";
 import { compile } from "./compile";
 import { parse } from "./parse";
 import XTree from "./assets/tree.svg?raw";
+import { Node } from "./node";
 import "./style.css";
 
 function dimension(rows: number, i: number): number {
@@ -18,7 +19,7 @@ function createData(depth: number) {
   const vals = Array.from(breadthFirst(tree.root));
   const cookie = Math.ceil(Math.random() * (Math.pow(2, depth) - 1));
   const mouse = tree.root?.data;
-  return { tree, vals, mouse, cookie };
+  return { depth, tree, vals, mouse, cookie, place: 0, feedback: "" };
 }
 
 function updateData(depth: number) {
@@ -30,10 +31,7 @@ function updateData(depth: number) {
 }
 
 render({
-  depth,
-  vals: data.vals,
-  mouse: data.mouse,
-  cookie: data.cookie,
+  ...data,
   feedback: "",
 });
 
@@ -102,8 +100,7 @@ function getSuccessMessage() {
         Math.random() * 40
       }px;margin-top:${Math.random() * 40}px;">No input, no cookie!</div>`;
       updateData(depth);
-      const { vals, mouse, cookie } = data;
-      return render({ depth, vals, mouse, cookie, feedback });
+      return render({ ...data, feedback });
     }
     const ast = parse(input.trim());
     const result = compile({
@@ -124,15 +121,19 @@ function getSuccessMessage() {
         setTimeout(res, 50 + Math.random() * 100);
       });
       render({
-        depth,
-        vals: data.vals,
-        mouse: data.mouse,
-        cookie: data.cookie,
+        ...data,
         feedback: success ? "Cookie found!<br/>" + getSuccessMessage() : "",
       });
       if (success) break;
     }
-    if (!result) {
+    if (result) {
+      if (typeof result === "object" && result instanceof Node) {
+        render({
+          ...data,
+          place: result.data as number,
+        });
+      }
+    } else {
       runState.failures++;
       const feedback = `<div class="failure" style="margin-left:${
         Math.random() * 40
@@ -140,10 +141,7 @@ function getSuccessMessage() {
         Math.random() * 40
       }px;">No cookie!<br/>${getFailureMessage()}</div>`;
       render({
-        depth,
-        vals: data.vals,
-        mouse: data.mouse,
-        cookie: data.cookie,
+        ...data,
         feedback,
       });
     }
@@ -154,13 +152,7 @@ function getSuccessMessage() {
       await new Promise((res) => {
         setTimeout(res, 50 + Math.random() * 100);
       });
-      render({
-        depth,
-        vals: data.vals,
-        mouse: data.mouse,
-        cookie: data.cookie,
-        feedback: "",
-      });
+      render(data);
     }
     const feedback = `<div class="failure" style="margin-left:${
       Math.random() * 40
@@ -168,10 +160,7 @@ function getSuccessMessage() {
       Math.random() * 40
     }px;">${err}.<br/>${getErrorMessage()}</div>`;
     render({
-      depth,
-      vals: data.vals,
-      mouse: data.mouse,
-      cookie: data.cookie,
+      ...data,
       feedback,
     });
   } finally {
@@ -186,12 +175,14 @@ function render({
   mouse,
   cookie,
   feedback,
+  place,
 }: {
   depth: number;
   vals: unknown[];
   mouse: unknown;
   cookie: number;
   feedback?: string;
+  place?: number;
 }) {
   app.innerHTML = `
   <h1>Merry X-Mas Mouse Mayhem</h1>
@@ -202,12 +193,10 @@ function render({
     ${vals
       .map(
         (val, i) =>
-          `<span class="node-data ${
-            val === cookie || val === mouse ? "node-visible" : ""
-          } ${val === cookie ? "cookie" : ""}
-          ${val === mouse ? "mouse" : ""}" style="margin-top:${
-            109 / dimension(depth, i)
-          }px;width:${
+          `<span class="node-data ${val === cookie ? "cookie" : ""}
+          ${val === mouse ? "mouse" : ""} ${
+            val === place ? "place" : ""
+          }" style="margin-top:${109 / dimension(depth, i)}px;width:${
             dimension(depth, i) * 3.9
           }px;transform:rotate(${Math.floor(
             Math.random() * 360
